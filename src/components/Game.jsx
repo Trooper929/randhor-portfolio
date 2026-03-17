@@ -65,11 +65,11 @@ export default function PortfolioGame() {
       ref.current = off;
     };
     const img1 = new Image();
-    img1.src = "/assets/randhor-16bit.png";
+    img1.src = `${import.meta.env.BASE_URL}assets/randhor-16bit.png`;
     img1.onload = () => stripWhite(img1, spritePixelRef);
 
     const img2 = new Image();
-    img2.src = "/assets/randhor-chibi.png";
+    img2.src = `${import.meta.env.BASE_URL}assets/randhor-chibi.png`;
     img2.onload = () => stripWhite(img2, spriteSheetRef);
   }, []);
 
@@ -108,6 +108,10 @@ export default function PortfolioGame() {
   }, []);
   const handleMobileKey = useCallback((key, pressed) => {
     stateRef.current.keys[key] = pressed;
+    if (key === "e" && pressed) {
+      const px = stateRef.current.playerX;
+      if (px > 4500 && px < 4800) setShowGuild((v) => !v);
+    }
   }, []);
 
   useEffect(() => {
@@ -341,7 +345,8 @@ export default function PortfolioGame() {
       const nearGuild = s.playerX > 4500 && s.playerX < 4800;
 
       // ── AUDIO TRIGGERS ──────────────────────────────────────
-      if (s.moving && s.time % 18 === 0) audio.playFootstep();
+      if (s.moving && s.time % 18 === 0 && !e.vibeCodingActive)
+        audio.playFootstep();
       if (unlockedSkills > lastSkillCountRef.current) {
         audio.playSkillUnlock(unlockedSkills - 1);
         lastSkillCountRef.current = unlockedSkills;
@@ -661,7 +666,7 @@ export default function PortfolioGame() {
               label: "Resume",
               icon: "📄",
               color: "#ffaa44",
-              href: "/Brandon-Valentine-Resume.pdf",
+              href: `${import.meta.env.BASE_URL}Brandon-Valentine-Resume.pdf`,
             },
           ].map((link) => (
             <a

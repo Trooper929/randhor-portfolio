@@ -6,6 +6,7 @@ export const SKILLS = [
   { name: "Node/Express", level: 63, slimeColor: "#7fcf78" },
   { name: "MongoDB", level: 58, slimeColor: "#5de04a" },
   { name: "Git/GitHub", level: 68, slimeColor: "#ff7055" },
+  { name: "Authentication", level: 75, slimeColor: "#ff4488" },
   { name: "AI Prompting", level: 78, slimeColor: "#ff88cc" },
   { name: "Charisma", level: 99, slimeColor: "#ffdd00" },
   { name: "Adaptability", level: 99, slimeColor: "#ffffff" },

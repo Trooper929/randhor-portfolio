@@ -510,7 +510,7 @@ export function drawSkillZone(ctx, zone, cameraX, unlocked, time) {
 
   if (count > 0) {
     ctx.save();
-    ctx.font = "bold 10px monospace";
+    ctx.font = "bold 16px monospace";
     ctx.textAlign = "center";
     ctx.fillStyle = rank.color;
     ctx.shadowColor = rank.color;
@@ -520,23 +520,24 @@ export function drawSkillZone(ctx, zone, cameraX, unlocked, time) {
   }
 
   ctx.save();
-  ctx.font = "bold 11px monospace";
+  ctx.font = "bold 16px monospace";
   ctx.textAlign = "center";
   if (count > 0) {
     ctx.fillStyle = rank.color;
     ctx.shadowColor = rank.color;
     ctx.shadowBlur = 6;
-    ctx.fillText(zone.name, x, GROUND_Y + 18);
-    ctx.font = "9px monospace";
+    ctx.fillText(zone.name, x, GROUND_Y + 20);
+    ctx.font = "14px monospace";
     ctx.shadowBlur = 0;
     ctx.fillStyle = rank.color + "99";
-    ctx.fillText(rank.label, x, GROUND_Y + 30);
-    ctx.fillText(rank.stars, x, GROUND_Y + 42);
+    ctx.fillText(rank.label, x, GROUND_Y + 38);
+    ctx.font = "16px monospace";
+    ctx.fillText(rank.stars, x, GROUND_Y + 56);
   } else {
     ctx.fillStyle = zone.slimeColor + "55";
-    ctx.fillText(zone.name, x, GROUND_Y + 18);
+    ctx.fillText(zone.name, x, GROUND_Y + 20);
     ctx.fillStyle = "#ffffff33";
-    ctx.fillText("???", x, GROUND_Y + 30);
+    ctx.fillText("???", x, GROUND_Y + 38);
   }
   ctx.restore();
 }

@@ -149,7 +149,7 @@ export default function RoyalDecree({
                   background: "rgba(0,0,0,0.4)",
                   border: `1px solid ${r.color}44`,
                   color: r.color,
-                  fontSize: "9px",
+                  fontSize: "18px",
                   padding: "3px 8px",
                   borderRadius: "4px",
                   fontFamily: "monospace",
@@ -267,7 +267,7 @@ export default function RoyalDecree({
               label: "Resume",
               icon: "📄",
               color: "#ffaa44",
-              href: "/Brandon-Valentine-Resume.pdf",
+              href: `${import.meta.env.BASE_URL}Brandon-Valentine-Resume.pdf`,
             },
           ].map((l) => (
             <a

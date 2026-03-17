@@ -16,14 +16,22 @@ export default function VibeCodingEvent({ onChoice }) {
         inset: 0,
         background: "rgba(0,0,0,0.92)",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "center",
         zIndex: 100,
         backdropFilter: "blur(6px)",
         padding: "20px",
+        overflowY: "auto",
       }}
     >
-      <div style={{ maxWidth: "520px", width: "100%", textAlign: "center" }}>
+      <div
+        style={{
+          maxWidth: "520px",
+          width: "100%",
+          textAlign: "center",
+          paddingBottom: "20px",
+        }}
+      >
         {!answered ? (
           <>
             <div

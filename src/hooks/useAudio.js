@@ -2,32 +2,69 @@ import { useRef } from "react";
 
 export default function useAudio() {
   const audioCtx = useRef(null);
+
+  // Master output for ALL SFX (so you can mute everything instantly)
+  const masterGainRef = useRef(null);
+  const mutedRef = useRef(false);
+
   const bossOscRef = useRef(null);
   const bossGainRef = useRef(null);
+  const bossPulseTimeoutRef = useRef(null);
 
   const getCtx = () => {
-    if (!audioCtx.current)
+    if (!audioCtx.current) {
       audioCtx.current = new (
         window.AudioContext || window.webkitAudioContext
       )();
+
+      // create master gain once
+      masterGainRef.current = audioCtx.current.createGain();
+      masterGainRef.current.gain.value = 1;
+      masterGainRef.current.connect(audioCtx.current.destination);
+    }
+
     if (audioCtx.current.state === "suspended") audioCtx.current.resume();
     return audioCtx.current;
   };
 
+  const getMaster = () => {
+    const ctx = getCtx();
+    if (!masterGainRef.current) {
+      masterGainRef.current = ctx.createGain();
+      masterGainRef.current.gain.value = 1;
+      masterGainRef.current.connect(ctx.destination);
+    }
+    return masterGainRef.current;
+  };
+
+  const setSfxMuted = (muted) => {
+    mutedRef.current = !!muted;
+    const master = getMaster();
+    master.gain.value = muted ? 0 : 1;
+  };
+
   const beep = (freq, duration, type = "square", vol = 0.08, delay = 0) => {
     try {
+      if (mutedRef.current) return;
+
       const ctx = getCtx();
+      const master = getMaster();
+
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(master); // ✅ route through master
+
       osc.type = type;
       osc.frequency.value = freq;
+
       gain.gain.setValueAtTime(vol, ctx.currentTime + delay);
       gain.gain.exponentialRampToValueAtTime(
         0.001,
         ctx.currentTime + delay + duration,
       );
+
       osc.start(ctx.currentTime + delay);
       osc.stop(ctx.currentTime + delay + duration);
     } catch (e) {}
@@ -35,17 +72,25 @@ export default function useAudio() {
 
   const playFootstep = () => {
     try {
+      if (mutedRef.current) return;
+
       const ctx = getCtx();
+      const master = getMaster();
+
       const buf = ctx.createBuffer(1, ctx.sampleRate * 0.04, ctx.sampleRate);
       const data = buf.getChannelData(0);
-      for (let i = 0; i < data.length; i++)
+      for (let i = 0; i < data.length; i++) {
         data[i] = (Math.random() * 2 - 1) * (1 - i / data.length) * 0.15;
+      }
+
       const src = ctx.createBufferSource();
       src.buffer = buf;
+
       const gain = ctx.createGain();
       gain.gain.value = 0.3;
+
       src.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(master); // ✅ route through master
       src.start();
     } catch (e) {}
   };
@@ -58,20 +103,40 @@ export default function useAudio() {
     beep(freq * 2, 0.18, "sine", 0.08, 0.16);
   };
 
+  const stopBossMusic = () => {
+    try {
+      bossOscRef.current?.stop();
+    } catch (e) {}
+    bossOscRef.current = null;
+    bossGainRef.current = null;
+
+    if (bossPulseTimeoutRef.current) {
+      clearTimeout(bossPulseTimeoutRef.current);
+      bossPulseTimeoutRef.current = null;
+    }
+  };
+
   const playBossMusic = () => {
     try {
       const ctx = getCtx();
+      const master = getMaster();
+
       stopBossMusic();
+
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+
       osc.type = "sawtooth";
       osc.frequency.value = 55;
       gain.gain.value = 0.04;
+
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(master); // ✅ route through master
       osc.start();
+
       bossOscRef.current = osc;
       bossGainRef.current = gain;
+
       const pulse = () => {
         if (!bossGainRef.current) return;
         bossGainRef.current.gain.setValueAtTime(0.06, ctx.currentTime);
@@ -79,18 +144,11 @@ export default function useAudio() {
           0.02,
           ctx.currentTime + 0.5,
         );
-        setTimeout(pulse, 500);
+        bossPulseTimeoutRef.current = setTimeout(pulse, 500);
       };
+
       pulse();
     } catch (e) {}
-  };
-
-  const stopBossMusic = () => {
-    try {
-      bossOscRef.current?.stop();
-    } catch (e) {}
-    bossOscRef.current = null;
-    bossGainRef.current = null;
   };
 
   const playVictoryFanfare = () => {
@@ -110,6 +168,7 @@ export default function useAudio() {
   };
 
   return {
+    setSfxMuted,
     playFootstep,
     playSkillUnlock,
     playBossMusic,
